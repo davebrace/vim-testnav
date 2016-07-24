@@ -3,6 +3,11 @@ module TestNav
   class << self
 
     def toggle
+      current_directory = VIM.command(":pwd")
+      current_buffer = VIM::Buffer.current
+      current_file = current_buffer.name
+      alternate_file = find_alternate_file_path(current_directory, current_file)
+      VIM.command(":edit #{alternate_file}")
     end
 
     def find_alternate_file_path(working_directory, current_file_path)
