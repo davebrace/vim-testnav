@@ -6,6 +6,7 @@ module TestNav
       current_directory = VIM::evaluate("getcwd()")
       current_buffer = VIM::Buffer.current
       current_file = current_buffer.name
+      return if current_file.nil?
       alternate_file = find_alternate_file_path(current_directory, current_file)
       VIM.command(":edit #{alternate_file}")
     end
