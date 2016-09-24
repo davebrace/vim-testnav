@@ -8,6 +8,7 @@ module TestNav
       current_file = current_buffer.name
       return if current_file.nil?
       alternate_file = find_alternate_file_path(current_directory, current_file)
+      return if alternate_file.nil?
       VIM.command(":edit #{alternate_file}")
     end
 
