@@ -3,7 +3,7 @@ module TestNav
   class << self
 
     def toggle
-      current_directory = VIM.command(":pwd")
+      current_directory = VIM::evaluate("getcwd()")
       current_buffer = VIM::Buffer.current
       current_file = current_buffer.name
       alternate_file = find_alternate_file_path(current_directory, current_file)
@@ -12,9 +12,10 @@ module TestNav
 
     def find_alternate_file_path(working_directory, current_file_path)
       full_file_path = File.join(working_directory, current_file_path)
+      current_file_name_without_ext = File.basename(full_file_path, File.extname(full_file_path))
       current_file_name = File.basename(full_file_path)
 
-      if current_file_name =~ /spec|test/
+      if current_file_name_without_ext =~ /spec\Z|test\Z/
         find_prod_file(working_directory, current_file_name)
       else
         find_test_file(working_directory, current_file_name)

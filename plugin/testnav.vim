@@ -10,12 +10,13 @@ function! s:RubyWarning() abort
 endfunction
 
 ruby $LOAD_PATH.unshift File.join(File.dirname(Vim.evaluate('expand("<sfile>")')), '../ruby')
-ruby require test_nav
+ruby require "test_nav"
 
 function! testnav#ToggleTestFile() abort
   if has('ruby')
-    ruby $test_nav.toggle()
+    echo 'Run ruby function'
+    ruby TestNav.toggle()
   endif
 endfunction
 
-nnoremap <leader>m testnav#ToggleTestFile()
+nnoremap <Leader>m :call testnav#ToggleTestFile()<CR>
