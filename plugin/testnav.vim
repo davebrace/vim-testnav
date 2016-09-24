@@ -19,4 +19,4 @@ function! testnav#ToggleTestFile() abort
   endif
 endfunction
 
-nnoremap <Leader>m :call testnav#ToggleTestFile()<CR>
+nnoremap <Leader>. :call testnav#ToggleTestFile()<CR>
