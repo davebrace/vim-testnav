@@ -29,16 +29,20 @@ module TestNav
 
     def find_prod_file(working_directory, current_file_name)
       production_file_name = current_file_name.gsub(/_(spec|test)/, "")
-      files = `find #{working_directory} -name "#{production_file_name}" -print`.split(/\n/)
+      files = `find #{working_directory} -name "#{production_file_name}" #{exclude_directories_clause(working_directory)} -print`.split(/\n/)
       production_file_full_path = files.first
       production_file_full_path.gsub("#{working_directory}#{File::SEPARATOR}", "") if production_file_full_path
     end
 
     def find_test_file(working_directory, current_file_name)
       filename_without_suffix = current_file_name.split(".").first
-      files = `find #{working_directory} -name "#{filename_without_suffix}*" -print`.split(/\n/)
+      files = `find #{working_directory} -name "#{filename_without_suffix}*" #{exclude_directories_clause(working_directory)} -print`.split(/\n/)
       test_file_full_path = files.select { |f| f =~ /_(spec|test)\./ }.first
       test_file_full_path.gsub("#{working_directory}#{File::SEPARATOR}", "") if test_file_full_path
+    end
+
+    def exclude_directories_clause(working_directory)
+      "-not -path \"#{working_directory}/.git/*\" -prune -not -path \"#{working_directory}/.node_modules/*\" -prune -not -path \"#{working_directory}/.svn/*\" -prune"
     end
 
   end
