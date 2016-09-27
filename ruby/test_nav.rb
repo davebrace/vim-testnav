@@ -1,3 +1,5 @@
+require "pp"
+
 module TestNav
 
   class << self
@@ -18,27 +20,57 @@ module TestNav
       current_file_name = File.basename(full_file_path)
 
       if current_file_name_without_ext =~ /spec\Z|test\Z/
-        find_prod_file(working_directory, current_file_name)
+        find_prod_file(working_directory, full_file_path, current_file_name)
       else
-        find_test_file(working_directory, current_file_name)
+        find_test_file(working_directory, full_file_path, current_file_name)
       end
     end
 
 
     private
 
-    def find_prod_file(working_directory, current_file_name)
+    Score = Struct.new(:alt_file, :score)
+
+    def find_prod_file(working_directory, full_file_path, current_file_name)
       production_file_name = current_file_name.gsub(/_(spec|test)/, "")
       files = `find #{working_directory} -name "#{production_file_name}" #{exclude_directories_clause(working_directory)} -print`.split(/\n/)
-      production_file_full_path = files.first
-      production_file_full_path.gsub("#{working_directory}#{File::SEPARATOR}", "") if production_file_full_path
+      if files.size > 1
+        prod_file = find_best_match(files, full_file_path)
+      else
+        prod_file = files.first
+      end
+      prod_file.gsub("#{working_directory}#{File::SEPARATOR}", "") if prod_file
     end
 
-    def find_test_file(working_directory, current_file_name)
+    def find_test_file(working_directory, full_file_path, current_file_name)
       filename_without_suffix = current_file_name.split(".").first
       files = `find #{working_directory} -name "#{filename_without_suffix}*" #{exclude_directories_clause(working_directory)} -print`.split(/\n/)
-      test_file_full_path = files.select { |f| f =~ /_(spec|test)\./ }.first
-      test_file_full_path.gsub("#{working_directory}#{File::SEPARATOR}", "") if test_file_full_path
+      test_files = files.select { |f| f =~ /_(spec|test)\./ }
+      if test_files.size > 1
+        test_file = find_best_match(test_files, full_file_path)
+      else
+        test_file = test_files.first
+      end
+      test_file.gsub("#{working_directory}#{File::SEPARATOR}", "") if test_file
+    end
+
+    def find_best_match(alt_files, full_file_path)
+      file_parts = full_file_path.split("/").reverse.drop(1)
+
+      scores = alt_files.map do |file|
+        alt_file_parts = file.split("/").reverse.drop(1)
+        score = 0
+        alt_file_parts.each_with_index do |part, index|
+          if part == file_parts[index]
+            score += 1
+          else
+            break
+          end
+        end
+        Score.new(file, score)
+      end
+
+      scores.max_by { |score| score.score }.alt_file
     end
 
     def exclude_directories_clause(working_directory)
