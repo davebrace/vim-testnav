@@ -14,7 +14,6 @@ ruby require "test_nav"
 
 function! testnav#ToggleTestFile() abort
   if has('ruby')
-    echo 'Run ruby function'
     ruby TestNav.toggle()
   endif
 endfunction
