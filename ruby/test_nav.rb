@@ -74,7 +74,7 @@ module TestNav
     end
 
     def exclude_directories_clause(working_directory)
-      "-not -path \"#{working_directory}/.git/*\" -prune -not -path \"#{working_directory}/.node_modules/*\" -prune -not -path \"#{working_directory}/.svn/*\" -prune"
+      "-not -path \"#{working_directory}/.git/*\" -prune -not -path \"#{working_directory}/node_modules/*\" -prune -not -path \"#{working_directory}/.svn/*\" -prune"
     end
 
   end
