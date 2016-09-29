@@ -1,5 +1,3 @@
-require "pp"
-
 module TestNav
 
   class << self
