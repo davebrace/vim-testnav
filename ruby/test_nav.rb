@@ -30,7 +30,7 @@ module TestNav
     Score = Struct.new(:alt_file, :score)
 
     def find_prod_file(working_directory, full_file_path, current_file_name)
-      production_file_name = current_file_name.gsub(/_(spec|test)/, "")
+      production_file_name = current_file_name.gsub(/(_|-)(spec|test)/, "")
       files = `find #{working_directory} -name "#{production_file_name}" #{exclude_directories_clause(working_directory)} -print`.split(/\n/)
       if files.size > 1
         prod_file = find_best_match(files, full_file_path)
@@ -43,7 +43,7 @@ module TestNav
     def find_test_file(working_directory, full_file_path, current_file_name)
       filename_without_suffix = current_file_name.split(".").first
       files = `find #{working_directory} -name "#{filename_without_suffix}*" #{exclude_directories_clause(working_directory)} -print`.split(/\n/)
-      test_files = files.select { |f| f =~ /_(spec|test)\./ }
+      test_files = files.select { |f| f =~ /(_|-)(spec|test)\./ }
       if test_files.size > 1
         test_file = find_best_match(test_files, full_file_path)
       else
