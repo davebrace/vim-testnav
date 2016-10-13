@@ -31,7 +31,7 @@ module TestNav
 
     def find_prod_file(working_directory, full_file_path, current_file_name)
       production_file_name = current_file_name.gsub(/(_|-)(spec|test)/, "")
-      files = `find #{working_directory} -name "#{production_file_name}" #{exclude_directories_clause(working_directory)} -print`.split(/\n/)
+      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{production_file_name}" -print`.split(/\n/)
       if files.size > 1
         prod_file = find_best_match(files, full_file_path)
       else
@@ -42,7 +42,7 @@ module TestNav
 
     def find_test_file(working_directory, full_file_path, current_file_name)
       filename_without_suffix = current_file_name.split(".").first
-      files = `find #{working_directory} -name "#{filename_without_suffix}*" #{exclude_directories_clause(working_directory)} -print`.split(/\n/)
+      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{filename_without_suffix}*" -print`.split(/\n/)
       test_files = files.select { |f| f =~ /(_|-)(spec|test)\./ }
       if test_files.size > 1
         test_file = find_best_match(test_files, full_file_path)
@@ -72,7 +72,7 @@ module TestNav
     end
 
     def exclude_directories_clause(working_directory)
-      "-not -path \"#{working_directory}/.git/*\" -prune -not -path \"#{working_directory}/node_modules/*\" -prune -not -path \"#{working_directory}/.svn/*\" -prune"
+      "-type d -name '.git' -prune -o -type d -name 'node_modules' -prune -o -type d -name '.svn' -prune -o"
     end
 
   end
