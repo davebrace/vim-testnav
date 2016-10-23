@@ -15,12 +15,11 @@ module TestNav
     def find_alternate_file_path(working_directory, current_file_path)
       full_file_path = File.join(working_directory, current_file_path)
       current_file_name_without_ext = File.basename(full_file_path, File.extname(full_file_path))
-      current_file_name = File.basename(full_file_path)
 
       if current_file_name_without_ext =~ /spec\Z|test\Z/
-        find_prod_file(working_directory, full_file_path, current_file_name)
+        find_prod_file(working_directory, full_file_path, current_file_name_without_ext)
       else
-        find_test_file(working_directory, full_file_path, current_file_name)
+        find_test_file(working_directory, full_file_path, current_file_name_without_ext)
       end
     end
 
@@ -31,18 +30,18 @@ module TestNav
 
     def find_prod_file(working_directory, full_file_path, current_file_name)
       production_file_name = current_file_name.gsub(/(_|-)(spec|test)/, "")
-      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{production_file_name}" -print`.split(/\n/)
-      if files.size > 1
-        prod_file = find_best_match(files, full_file_path)
+      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{production_file_name}*" -print`.split(/\n/)
+      prod_files = files.select { |f| f !~ /(_|-)(spec|test)\./ }
+      if prod_files.size > 1
+        prod_file = find_best_match(prod_files, full_file_path)
       else
-        prod_file = files.first
+        prod_file = prod_files.first
       end
       prod_file.gsub("#{working_directory}#{File::SEPARATOR}", "") if prod_file
     end
 
     def find_test_file(working_directory, full_file_path, current_file_name)
-      filename_without_suffix = current_file_name.split(".").first
-      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{filename_without_suffix}*" -print`.split(/\n/)
+      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{current_file_name}*" -print`.split(/\n/)
       test_files = files.select { |f| f =~ /(_|-)(spec|test)\./ }
       if test_files.size > 1
         test_file = find_best_match(test_files, full_file_path)

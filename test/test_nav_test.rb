@@ -73,5 +73,16 @@ describe TestNav do
         assert_equal "app/controllers/v2/companies/news_controller.rb", result
       end
     end
+
+    describe "given an elixir production file with an elixir script test file" do
+      it "identifies the script file as the alternate test file" do
+        FileUtils.rm_rf("tmp")
+        FileUtils.mkdir_p("tmp/test/app/controllers/v1/companies/")
+        FileUtils.touch("tmp/test/app/controllers/v1/companies/news_controller_test.exs")
+
+        result = TestNav.find_alternate_file_path("#{Dir.pwd}/tmp", "app/controllers/v1/companies/news_controller.ex")
+        assert_equal "test/app/controllers/v1/companies/news_controller_test.exs", result
+      end
+    end
   end
 end
