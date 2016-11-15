@@ -31,6 +31,20 @@ describe TestNav do
       end
     end
 
+    describe "given the production file is passed as the argument to navigate and there is a test file match with multiple similar options" do
+      it "returns the production code file" do
+        FileUtils.rm_rf("tmp")
+        FileUtils.mkdir_p("tmp/app/models")
+        FileUtils.mkdir_p("tmp/spec/models")
+        FileUtils.touch("tmp/app/models/user.rb")
+        FileUtils.touch("tmp/spec/models/user_metrics_spec.rb")
+        FileUtils.touch("tmp/spec/models/user_spec.rb")
+
+        result = TestNav.find_alternate_file_path("#{Dir.pwd}/tmp", "app/models/user.rb")
+        assert_equal "spec/models/user_spec.rb", result
+      end
+    end
+
     describe "given there is a test alternate in a .git folder" do
       it "does not return the alterate" do
         FileUtils.rm_rf("tmp")

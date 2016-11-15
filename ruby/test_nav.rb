@@ -1,5 +1,7 @@
 module TestNav
 
+  TEST_FILE_REGEX = /(_|-)(spec|test)/
+
   class << self
 
     def toggle
@@ -29,11 +31,11 @@ module TestNav
     Score = Struct.new(:alt_file, :score)
 
     def find_prod_file(working_directory, full_file_path, current_file_name)
-      production_file_name = current_file_name.gsub(/(_|-)(spec|test)/, "")
+      production_file_name = current_file_name.gsub(TEST_FILE_REGEX, "")
       files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{production_file_name}*" -print`.split(/\n/)
       prod_files = files.select { |f| f !~ /(_|-)(spec|test)\./ }
       if prod_files.size > 1
-        prod_file = find_best_match(prod_files, full_file_path)
+        prod_file = find_best_match(prod_files, full_file_path, current_file_name)
       else
         prod_file = prod_files.first
       end
@@ -44,14 +46,14 @@ module TestNav
       files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{current_file_name}*" -print`.split(/\n/)
       test_files = files.select { |f| f =~ /(_|-)(spec|test)\./ }
       if test_files.size > 1
-        test_file = find_best_match(test_files, full_file_path)
+        test_file = find_best_match(test_files, full_file_path, current_file_name)
       else
         test_file = test_files.first
       end
       test_file.gsub("#{working_directory}#{File::SEPARATOR}", "") if test_file
     end
 
-    def find_best_match(alt_files, full_file_path)
+    def find_best_match(alt_files, full_file_path, current_file_name)
       file_parts = full_file_path.split("/").reverse.drop(1)
 
       scores = alt_files.map do |file|
@@ -63,6 +65,11 @@ module TestNav
           else
             break
           end
+        end
+
+        file_name_without_ext = File.basename(file, File.extname(file))
+        if current_file_name.gsub(TEST_FILE_REGEX, "") == file_name_without_ext.gsub(TEST_FILE_REGEX, "")
+          score += 1
         end
         Score.new(file, score)
       end
