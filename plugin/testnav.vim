@@ -18,4 +18,9 @@ function! testnav#ToggleTestFile() abort
   endif
 endfunction
 
-nnoremap <Leader>. :call testnav#ToggleTestFile()<CR>
+command! TestNav call testnav#ToggleTestFile()
+
+if !hasmapto('<Plug>(TestNav)') && maparg('<Leader>.', 'n') ==# ''
+  nmap <unique> <Leader>. <Plug>(TestNav)
+endif
+nnoremap <silent> <Plug>(TestNav) :TestNav<CR>
