@@ -98,5 +98,16 @@ describe TestNav do
         assert_equal "test/app/controllers/v1/companies/news_controller_test.exs", result
       end
     end
+
+    describe "given a java production file with a java test file in idiomatic capitalized format" do
+      it "identifies the capitalized file with a similar name and Test as the alternate test file" do
+        FileUtils.rm_rf("tmp")
+        FileUtils.mkdir_p("tmp/test/app/controllers/v1/companies/")
+        FileUtils.touch("tmp/test/app/controllers/v1/companies/NewsControllerTest.java")
+
+        result = TestNav.find_alternate_file_path("#{Dir.pwd}/tmp", "app/controllers/v1/companies/NewsController.java")
+        assert_equal "test/app/controllers/v1/companies/NewsControllerTest.java", result
+      end
+    end
   end
 end

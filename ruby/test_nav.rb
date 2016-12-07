@@ -1,6 +1,7 @@
 module TestNav
 
-  TEST_FILE_REGEX = /(_|-)(spec|test)/
+  TEST_FILE_REGEX = /(_|-)?([Ss]pec|[Tt]est)/
+  TEST_FILE_WITH_END_PERIOD_REGEX = /(_|-)?([Ss]pec|[Tt]est)\./
 
   class << self
 
@@ -18,7 +19,7 @@ module TestNav
       full_file_path = File.join(working_directory, current_file_path)
       current_file_name_without_ext = File.basename(full_file_path, File.extname(full_file_path))
 
-      if current_file_name_without_ext =~ /spec\Z|test\Z/
+      if current_file_name_without_ext =~ /[Ss]pec\Z|[Tt]est\Z/
         find_prod_file(working_directory, full_file_path, current_file_name_without_ext)
       else
         find_test_file(working_directory, full_file_path, current_file_name_without_ext)
@@ -33,7 +34,7 @@ module TestNav
     def find_prod_file(working_directory, full_file_path, current_file_name)
       production_file_name = current_file_name.gsub(TEST_FILE_REGEX, "")
       files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{production_file_name}*" -print`.split(/\n/)
-      prod_files = files.select { |f| f !~ /(_|-)(spec|test)\./ }
+      prod_files = files.select { |f| f !~ TEST_FILE_WITH_END_PERIOD_REGEX }
       if prod_files.size > 1
         prod_file = find_best_match(prod_files, full_file_path, current_file_name)
       else
@@ -44,7 +45,7 @@ module TestNav
 
     def find_test_file(working_directory, full_file_path, current_file_name)
       files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{current_file_name}*" -print`.split(/\n/)
-      test_files = files.select { |f| f =~ /(_|-)(spec|test)\./ }
+      test_files = files.select { |f| f =~ TEST_FILE_WITH_END_PERIOD_REGEX }
       if test_files.size > 1
         test_file = find_best_match(test_files, full_file_path, current_file_name)
       else
