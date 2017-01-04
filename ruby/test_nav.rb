@@ -1,6 +1,6 @@
 module TestNav
 
-  TEST_FILE_REGEX = /(_|-)?([Ss]pec|[Tt]est)/
+  TEST_FILE_REGEX = /(_|-)?([Ss]pec|[Tt]est)\Z/
   TEST_FILE_WITH_END_PERIOD_REGEX = /(_|-)?([Ss]pec|[Tt]est)\./
 
   class << self
