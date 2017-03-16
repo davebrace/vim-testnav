@@ -33,7 +33,7 @@ module TestNav
 
     def find_prod_file(working_directory, full_file_path, current_file_name)
       production_file_name = current_file_name.gsub(TEST_FILE_REGEX, "")
-      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{production_file_name}*" -print`.split(/\n/)
+      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{production_file_name}*" -type f -print`.split(/\n/)
       prod_files = files.select { |f| f !~ TEST_FILE_WITH_END_PERIOD_REGEX }
       if prod_files.size > 1
         prod_file = find_best_match(prod_files, full_file_path, current_file_name)
@@ -44,7 +44,7 @@ module TestNav
     end
 
     def find_test_file(working_directory, full_file_path, current_file_name)
-      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{current_file_name}*" -print`.split(/\n/)
+      files = `find #{working_directory} #{exclude_directories_clause(working_directory)} -name "#{current_file_name}*" -type f -print`.split(/\n/)
       test_files = files.select { |f| f =~ TEST_FILE_WITH_END_PERIOD_REGEX }
       if test_files.size > 1
         test_file = find_best_match(test_files, full_file_path, current_file_name)

@@ -88,6 +88,16 @@ describe TestNav do
       end
     end
 
+    describe "given there is a directory that matches a test alternate" do
+      it "returns nil" do
+        FileUtils.rm_rf("tmp")
+        FileUtils.mkdir_p("tmp/app/controllers/v2/companies/news_controller/")
+
+        result = TestNav.find_alternate_file_path("#{Dir.pwd}/tmp", "test/controllers/v2/companies/news_controller_test.rb")
+        assert_equal nil, result
+      end
+    end
+
     describe "given an elixir production file with an elixir script test file" do
       it "identifies the script file as the alternate test file" do
         FileUtils.rm_rf("tmp")
